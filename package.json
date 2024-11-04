@@ -1,7 +1,24 @@
 {
+  "name": "gmaps-leads-generator",
+  "version": "1.0.0",
+  "description": "Google Maps Leads Generator",
+  "type": "module",
   "dependencies": {
-    "@googlemaps/google-maps-services-js": "^3.4.0",
     "dotenv": "^16.4.5",
-    "puppeteer": "^23.6.1"
-  }
+    "exceljs": "^4.4.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.8.7",
+    "@types/node-fetch": "^2.6.11",
+    "typescript": "^5.6.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node -r dotenv/config dist/index.js",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

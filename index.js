@@ -4,25 +4,29 @@ const puppeteer = require('puppeteer');
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
 
+    // Naviguer vers la page des résultats Google Maps
     await page.goto('https://www.google.com/maps/search/construction+companies+in+United+States/@34.518,-118.0745673,4z/data=!3m1!4b1!5m1!1e1?entry=ttu&g_ep=EgoyMDI0MTAyOS4wIKXMDSoASAFQAw%3D%3D', { waitUntil: 'networkidle2' });
 
+    // Fonction de scroll pour charger plus de résultats dans la liste des entreprises
     const scrollToBottom = async () => {
         await page.evaluate(() => {
             window.scrollBy(0, window.innerHeight);
         });
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(2000);  // Attendre que les résultats chargent
     };
 
     const getCompanyDetails = async (companyElement) => {
         await companyElement.click();
 
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise(resolve => setTimeout(resolve, 3000));  // Attendre le chargement du détail de l'entreprise
 
+        // Extraire le rating de l'entreprise
         const rating = await page.evaluate(() => {
             const ratingElement = document.querySelector('.fontDisplayLarge');
             return ratingElement ? parseFloat(ratingElement.innerText) : null;
         });
 
+        // Si le rating est supérieur à 4.5, retour à la liste des entreprises
         // if (rating > 4.5) {
         //     await page.goBack();
         //     return null;
@@ -30,6 +34,7 @@ const puppeteer = require('puppeteer');
 
         console.log('rating :', rating);
 
+        // Extraire téléphone, site web, et reviews
         const details = await page.evaluate(() => {
 
             const infos = document.querySelectorAll('.AeaXub .Io6YTe.fontBodyMedium.kR99db.fdkmkc');
@@ -42,6 +47,7 @@ const puppeteer = require('puppeteer');
             console.log('phone :', phone);
             console.log('website :', website);
 
+            // Sélectionner deux reviews à moins de 3 étoiles
             const reviews = [];
             document.querySelectorAll('.jftiEf.fontBodyMedium').forEach(review => {
                 const ratingText = review.querySelector('[aria-label*="star"]')?.getAttribute('aria-label') || '';
@@ -56,18 +62,19 @@ const puppeteer = require('puppeteer');
             return { phone, website, reviews };
         });
 
-        await page.goBack();
+        await page.goBack();  // Retourner à la liste des entreprises
         return details;
     };
 
-    const companies = await page.$$('a.hfpxzc');
+    // Boucle pour chaque entreprise dans la liste
+    const companies = await page.$$('a.hfpxzc');  // Ciblage des éléments de la liste
 
     let i = 0;
 
     for (const company of companies) {
         const details = await getCompanyDetails(company);
         if (details) {
-            console.log(details);
+            console.log(details);  // Afficher les informations obtenues
         }
     }
 
